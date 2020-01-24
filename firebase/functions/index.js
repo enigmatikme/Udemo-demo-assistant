@@ -41,13 +41,14 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   }
 
   function voting(agent) {
-    agent.add('Voting locally for ' + agent.parameters['Singer'] );
+    // agent.add('Voting locally for ' + agent.parameters['Singer'] );
+    console.log("calling voting");
     //save data to db
     let responseText = '';
     let singer = agent.parameters['Singer'];
     if (singer !== null) {
       let artistName = singer.replace(' ', '').toLowerCase();
-      let currentArtist = admin.database().ref().child('/artists/' + aristName);
+      let currentArtist = admin.database().ref().child('/artists/' + artistName);
 
       // once method is used because without it, when we update the votes value
       // the callback will be triggered again and again in a loop and max out
@@ -63,11 +64,12 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
             votes: 1
           });
         }
-        responseText = "Thank you for voting!";
       });
+      responseText = "Thank you for voting!";
     } else {
       
     }
+    agent.add(responseText);
   }
   
   // function voting(agent) {
