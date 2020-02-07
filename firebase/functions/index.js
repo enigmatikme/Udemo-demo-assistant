@@ -43,6 +43,14 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   function voting(agent) {
     // agent.add('Voting locally for ' + agent.parameters['Singer'] );
     console.log("calling voting");
+    let conv = agent.conv(); //Get Actions on Google library conv instance
+    // .conv is an Actions on Google library Dialogflow conversation object
+    // * Actions library built in data-object is very useful for storing
+    //*  information with a session
+    //    ! deep dive into conv(), it returns DialogflowConversation and will
+    //!    only return the right object if it comes from Google Assistant: Home/mini, google
+    //!    assistant or simulator, but NOT dialogflow test
+    let endConversation = false;
     //save data to db
     let responseText = '';
     let singer = agent.parameters['Singer'];
@@ -67,9 +75,32 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
       });
       responseText = "Thank you for voting!";
     } else {
+      if (conv.data.voteFallback === undefined) {
+        conv.data.voteFallback = 0;
+      }
+      conv.data.voteFallback++;
+
+      if (conv.data.voteFallback > 2) {
+        responseText = "Thank you for voting. Your vote was refused. Try again later.";
+        endConversation = true;
+        console.log("larger than 2")
+      } else {
+        responseText = request.body.queryResult.fulfillmentText;
+        console.log("+++", `${request.body.queryResult.fulfillmentText}`)
+      }
       
+      if (endConversation) {
+        conv.close(responseText);
+        // ends conversation by stopping mic from being opened 
+        console.log("ended conversation")
+      } else {
+        conv.ask(responseText);
+        // to continue conversation 
+        console.log("continue conversations +++ ")
+      }
     }
-    agent.add(responseText);
+    agent.add(conv);
+    // we pass Actions obj: conv to the agent
   }
   
   // function voting(agent) {
