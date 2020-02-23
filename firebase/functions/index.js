@@ -12,7 +12,6 @@ const {Card, Suggestion} = require('dialogflow-fulfillment');
 
 process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
 
-
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./config/v2-udemy-demo-assistant-dyndqw-firebase-adminsdk-e109g-a3e738f31b.json");
@@ -99,7 +98,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         console.log("continue conversations +++ ")
       }
     }
-    agent.add(conv);
+    agent.add(responseText);
     // we pass Actions obj: conv to the agent
   }
   
